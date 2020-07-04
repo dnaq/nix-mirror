@@ -1,0 +1,27 @@
+[package]
+name = "nix-mirror"
+version = "0.1.0"
+authors = ["user <user@example.org>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+futures = "0.3.6"
+indicatif = "0.15.0"
+structopt = "0.3.20"
+anyhow = "1.0.33"
+xz2 = "0.1.6"
+path-clean = "0.1.0"
+tempfile = "3.1.0"
+nix-base32 = "0.1.1"
+sha2 = "0.9.1"
+
+[dependencies.tokio]
+version = "0.2.22"
+features = [ "fs", "macros", "rt-threaded" ]
+
+[dependencies.reqwest]
+version = "0.10.8"
+features = [ "stream" ]
