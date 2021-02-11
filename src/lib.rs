@@ -2,7 +2,7 @@ use std::path::Path;
 
 use futures::stream::StreamExt;
 use tokio::fs;
-use tokio::prelude::*;
+use tokio::io::{self, AsyncBufReadExt, AsyncSeekExt, AsyncWriteExt};
 use tokio::task;
 
 use anyhow::{anyhow, bail, Context, Result};
@@ -125,8 +125,7 @@ pub async fn handle_narinfo(
     let mut url = Err(anyhow!("failed to find URL"));
     let mut references = Vec::new();
     let mut filehash = Err(anyhow!("failed to find filehash"));
-    while let Some(line) = lines.next().await {
-        let line = line?;
+    while let Some(line) = lines.next_line().await? {
         let mut split = line.splitn(2, ": ");
         let key = split.next().context("failed to find key")?;
         let val = split.next().context("failed to find val")?;
