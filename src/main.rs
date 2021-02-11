@@ -21,7 +21,7 @@ struct Opt {
     mirror_dir: PathBuf,
 
     /// URL to the cache server that should be used
-    #[structopt(short, long, default_value="https://cache.nixos.org")]
+    #[structopt(short, long, default_value = "https://cache.nixos.org")]
     cache_url: String,
 
     /// Maximum number of concurrent downloads
