@@ -5,7 +5,7 @@ use tokio::fs;
 use tokio::io::{self, AsyncBufReadExt, AsyncSeekExt, AsyncWriteExt};
 use tokio::task;
 
-use anyhow::{anyhow, bail, Context, Result};
+use eyre::{bail, eyre, Result};
 use nix_base32::to_nix_base32;
 use path_clean::PathClean;
 use sha2::{Digest, Sha256};
@@ -20,7 +20,7 @@ pub fn filename_to_narinfo_hash(filename: &str) -> Result<&str> {
     filename
         .split('-')
         .next()
-        .ok_or_else(|| anyhow!("failed to parse narinfo hash: {}", filename))
+        .ok_or_else(|| eyre!("failed to parse narinfo hash: {}", filename))
 }
 
 /// Extracts the narinfo hash path from a nix store path
@@ -33,7 +33,7 @@ pub fn store_path_to_narinfo_hash(store_path: &str) -> Result<&str> {
     store_path
         .split('/')
         .nth(3)
-        .ok_or_else(|| anyhow!("failed to parse store_path: {}", store_path))
+        .ok_or_else(|| eyre!("failed to parse store_path: {}", store_path))
         .and_then(filename_to_narinfo_hash)
 }
 
@@ -122,13 +122,13 @@ pub async fn handle_narinfo(
     let mut lines = narinfo_file.lines();
 
     // ugly parser, but it would be overkill to reach for a parsing library here
-    let mut url = Err(anyhow!("failed to find URL"));
+    let mut url = Err(eyre!("failed to find URL"));
     let mut references = Vec::new();
-    let mut filehash = Err(anyhow!("failed to find filehash"));
+    let mut filehash = Err(eyre!("failed to find filehash"));
     while let Some(line) = lines.next_line().await? {
         let mut split = line.splitn(2, ": ");
-        let key = split.next().context("failed to find key")?;
-        let val = split.next().context("failed to find val")?;
+        let key = split.next().ok_or_else(|| eyre!("failed to find key"))?;
+        let val = split.next().ok_or_else(|| eyre!("failed to find val"))?;
         match key {
             "URL" => url = Ok(String::from(val)),
             "References" => {
@@ -143,7 +143,7 @@ pub async fn handle_narinfo(
                     .split(':')
                     .nth(1)
                     .map(String::from)
-                    .context("invalid filehash")
+                    .ok_or_else(|| eyre!("invalid filehash"))
             }
             _ => {}
         }

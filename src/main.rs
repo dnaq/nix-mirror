@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use futures::stream::{self, StreamExt};
 use tokio::fs;
 
-use anyhow::Result;
+use eyre::Result;
 use indicatif::ProgressBar;
 use structopt::StructOpt;
 
